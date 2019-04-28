@@ -1,5 +1,6 @@
 import React from 'react';
 import { Store } from 'redux'
+import { Provider as ReduxProvider } from 'react-redux';
 
 import CssBaseline from '@material-ui/core/CssBaseline';
 
@@ -20,11 +21,13 @@ const App: React.FC<IProps> = (props: IProps) => {
 
     return (
         <div>
-            <CssBaseline/>
-            <div className="App">
-                <AppBar>HostAdmin</AppBar>
-                <LoginPage/>
-            </div>
+            <ReduxProvider store={props.store}>
+                <CssBaseline/>
+                <div className="App">
+                    <AppBar>HostAdmin</AppBar>
+                    <LoginPage/>
+                </div>
+            </ReduxProvider>
         </div>
     );
 };

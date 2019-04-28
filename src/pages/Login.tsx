@@ -1,9 +1,14 @@
 import React from 'react';
+import { Dispatch } from 'redux';
+import { connect } from 'react-redux';
 
 import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
+
+import * as Actions from '../store/auth/actions'
+import { State as StoreState } from '../store/index'
 
 function isValid(state:IState): boolean {
     if (state.username.length < 3) return false;
@@ -23,17 +28,24 @@ function renderLogin(valid: boolean, busy: boolean): React.ReactNode {
     )
 }
 
-interface IProps {
-
+interface PropsFromState {
+    auth: boolean,
+    busy: boolean,
 }
+
+interface PropsFromDispatch {
+    doLogin: typeof Actions.Login
+}
+
+type AllProps = PropsFromState & PropsFromDispatch;
 
 interface IState {
     username: string,
     password: string,
 }
 
-class Login extends React.Component<IProps, IState> {
-    constructor(props: IProps) {
+class Login extends React.Component<AllProps, IState> {
+    constructor(props: AllProps) {
         super(props);
 
         this.state = {
@@ -44,6 +56,7 @@ class Login extends React.Component<IProps, IState> {
 
     private handleSubmit(event:React.FormEvent): void {
         event.preventDefault();
+        this.props.doLogin(this.state.username, this.state.password);
     }
 
     private handleChange(field: string, event:React.ChangeEvent<HTMLInputElement>): void {
@@ -60,14 +73,10 @@ class Login extends React.Component<IProps, IState> {
     }
 
     render() {
-
-        const valid = isValid(this.state);
-        const busy = false;
-
         return (
             <Paper id="login">
                 <Typography variant="title">Login</Typography>
-                <form className="form" autoComplete="false" onSubmit={this.handleSubmit}>
+                <form className="form" autoComplete="false" onSubmit={this.handleSubmit.bind(this)}>
                     <TextField
                         id="username"
                         label="Username"
@@ -85,12 +94,24 @@ class Login extends React.Component<IProps, IState> {
                         margin="normal"
                         type="password"
                     />
-                    {renderLogin(valid, busy)}
+                    {renderLogin(isValid(this.state), this.props.busy)}
                 </form>
             </Paper>
         )
     }
 }
 
+function mapStateToProps(state: StoreState):PropsFromState {
+    return {
+        busy: state.auth.busy,
+        auth: state.auth.sessionID !== undefined
+    }
+}
 
-export default Login;
+function mapDispatchToProps(dispatch: Dispatch):PropsFromDispatch {
+    return {
+        doLogin: (username, password) => dispatch(Actions.Login(username, password))
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Login)

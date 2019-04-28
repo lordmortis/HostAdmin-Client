@@ -1,5 +1,8 @@
-import { Reducer } from 'redux'
+import {createReducer} from "typesafe-actions";
+
+import * as Actions from './actions'
 import * as Types from './types'
+
 
 const initialState: Types.State = {
     busy: false,
@@ -8,7 +11,17 @@ const initialState: Types.State = {
     errors: [],
 }
 
-export const reducer: Reducer<Types.State> = (state = initialState, action): Types.State => {
+export const reducer = createReducer(initialState)
+    .handleAction(Actions.Login, (state, action) => {
+        console.log("Got action:");
+        console.log(action);
+        return {
+            ...state,
+            busy: true,
+        }
+    });
+
+/*export const reducer: Reducer<Types.State> = (state = initialState, action): Types.State => {
     switch(action.type) {
         case Types.ActionTypes.LOGIN:
             return { ...state, busy: true };
@@ -16,5 +29,5 @@ export const reducer: Reducer<Types.State> = (state = initialState, action): Typ
             return {...state, busy: false };
         default: return state;
     }
-}
+}*/
 
