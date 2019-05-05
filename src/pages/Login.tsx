@@ -29,7 +29,7 @@ function renderLogin(valid: boolean, busy: boolean): React.ReactNode {
 }
 
 function renderErrors(errors: ReadonlyArray<string>): React.ReactNode {
-    if (errors.length == 0) return null;
+    if (errors.length === 0) return null;
     return (
         <Typography variant={"caption"} className={"errors"}>
             {errors.join(",")}

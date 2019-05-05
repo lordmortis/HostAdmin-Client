@@ -1,6 +1,6 @@
-import React from 'react';
+import React, {ReactNode} from 'react';
 import { Store } from 'redux'
-import { Provider as ReduxProvider } from 'react-redux';
+import { Provider as ReduxProvider, connect } from 'react-redux';
 
 import CssBaseline from '@material-ui/core/CssBaseline';
 
@@ -13,18 +13,34 @@ interface IProps {
     store: Store<StoreState>,
 }
 
-const App: React.FC<IProps> = (props: IProps) => {
+interface PropsFromState {
+    auth?: boolean,
+}
+
+function renderPages(auth?: boolean) : ReactNode {
+    if (auth) return null;
+    return <LoginPage/>
+}
+
+const App: React.FC<IProps> = (props: IProps & PropsFromState) => {
     return (
         <div>
             <ReduxProvider store={props.store}>
                 <CssBaseline/>
                 <div className="App">
                     <AppBar>HostAdmin</AppBar>
-                    <LoginPage/>
+                    {renderPages(props.auth)}
                 </div>
             </ReduxProvider>
         </div>
     );
 };
 
-export default App;
+
+function mapStateToProps(state: StoreState):PropsFromState {
+    return {
+        auth: state.auth.sessionID != null,
+    }
+}
+
+export default connect(mapStateToProps)(App);
