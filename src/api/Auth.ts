@@ -1,13 +1,17 @@
-import {Interface as UserContextInterface} from '../contexts/User';
-
-export function Login(context:UserContextInterface, username: string, password:string) : void {
-    console.log("Login with: " + username + " " + password);
-    setTimeout(() => {
-        console.log("context updated");
-        context.auth = true;
-    }, 1000)
+export interface LoginResponse {
+    expiry: Date,
+    sessionID: string,
 }
 
-export function Logout(): void {
-
+export function Login(username: string, password:string) : Promise<LoginResponse> {
+    return new Promise((resolve, reject) => {
+        console.log("Login with: " + username + " " + password);
+        setTimeout(() => {
+            reject("ERROR!");
+/*            resolve({
+                expiry: new Date(),
+                sessionID: "junk",
+            });*/
+        }, 1000);
+    });
 }

@@ -2,10 +2,15 @@ import * as SagaEffects from 'redux-saga/effects'
 import * as Actions from './actions'
 import * as Types from './types'
 
+import * as API from '../../api/Auth'
+
 function* handleLogin(action: ReturnType<typeof Actions.Login>) {
-    console.log(action.payload.username);
-    console.log(action.payload.password);
-    yield
+    try {
+        const data = yield SagaEffects.call(API.Login, action.payload.username, action.payload.password);
+        yield SagaEffects.put(Actions.LoggedIn(data.sessionID, data.expiry));
+    } catch (error) {
+        yield SagaEffects.put(Actions.LoginError(error));
+    }
 }
 
 function* watchFetchRequest() {
