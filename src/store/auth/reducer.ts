@@ -3,7 +3,6 @@ import {createReducer} from "typesafe-actions";
 import * as Actions from './actions'
 import * as Types from './types'
 
-
 const initialState: Types.State = {
     busy: false,
     sessionID: undefined,
@@ -12,12 +11,27 @@ const initialState: Types.State = {
 }
 
 export const reducer = createReducer(initialState)
-    .handleAction(Actions.Login, (state, action) => {
-        console.log("Got action:");
-        console.log(action);
+    .handleAction(Actions.Login, (state, action: ReturnType<typeof Actions.Login>) => {
         return {
             ...state,
             busy: true,
+            username: action.payload.username,
+        }
+    }).handleAction(Actions.LoggedIn, (state, action: ReturnType<typeof Actions.LoggedIn>) => {
+        return {
+            ...state,
+            busy: false,
+            sessionID: action.payload.sessionId,
+            expiry: action.payload.expiry,
+        }
+    }).handleAction(Actions.LoginError, (state, action: ReturnType<typeof Actions.LoginError>) => {
+        return {
+            ...state,
+            busy: false,
+            username: undefined,
+            sessionID: undefined,
+            expiry: undefined,
+            errors: [action.payload.error]
         }
     });
 

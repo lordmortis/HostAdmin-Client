@@ -16,9 +16,6 @@ interface IProps {
 }
 
 const App: React.FC<IProps> = (props: IProps) => {
-    console.log("props:");
-    console.log(props);
-
     return (
         <div>
             <ReduxProvider store={props.store}>
