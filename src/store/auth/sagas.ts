@@ -9,6 +9,8 @@ function* handleLogin(action: ReturnType<typeof Actions.Login>) {
         const data = yield SagaEffects.call(API.Login, action.payload.username, action.payload.password);
         yield SagaEffects.put(Actions.LoggedIn(data.sessionID, data.expiry));
     } catch (error) {
+        console.log("ERROR");
+        console.log(error.toString());
         yield SagaEffects.put(Actions.LoginError(error));
     }
 }
