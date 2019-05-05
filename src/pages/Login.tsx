@@ -28,9 +28,19 @@ function renderLogin(valid: boolean, busy: boolean): React.ReactNode {
     )
 }
 
+function renderErrors(errors: ReadonlyArray<string>): React.ReactNode {
+    if (errors.length == 0) return null;
+    return (
+        <Typography variant={"caption"} className={"errors"}>
+            {errors.join(",")}
+        </Typography>
+    )
+}
+
 interface PropsFromState {
     auth: boolean,
     busy: boolean,
+    errors: ReadonlyArray<string>,
 }
 
 interface PropsFromDispatch {
@@ -96,6 +106,7 @@ class Login extends React.Component<AllProps, IState> {
                     />
                     {renderLogin(isValid(this.state), this.props.busy)}
                 </form>
+                {renderErrors(this.props.errors)}
             </Paper>
         )
     }
@@ -104,7 +115,8 @@ class Login extends React.Component<AllProps, IState> {
 function mapStateToProps(state: StoreState):PropsFromState {
     return {
         busy: state.auth.busy,
-        auth: state.auth.sessionID !== undefined
+        auth: state.auth.sessionID !== undefined,
+        errors: state.auth.errors,
     }
 }
 

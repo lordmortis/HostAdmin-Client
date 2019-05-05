@@ -9,8 +9,6 @@ import {State as StoreState} from './store';
 import AppBar from './components/AppBar';
 import LoginPage from './pages/Login';
 
-import './App.css';
-
 interface IProps {
     store: Store<StoreState>,
 }
