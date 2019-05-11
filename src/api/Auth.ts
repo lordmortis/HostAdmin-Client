@@ -10,7 +10,33 @@ export function Login(username: string, password:string) : Promise<LoginResponse
         method: "POST",
         body: JSON.stringify({username: username, password: password}),
     };
-    return fetch(base.urlBase + "/1/login", Object.assign(options, base.defaults))
+    return fetch(base.urlBase + "/1/login", base.addDefaults(options))
+        .then(response => {
+            if (response.status === 200) {
+                return response.json().then(data => {
+                    base.setSessionID(data.sessionID);
+                    return {
+                        expiry: new Date(data.expiry),
+                        sessionID: data.sessionID,
+                    }
+                });
+            }
+            if (response.status === 401) {
+                throw new Error("Invalid username/password");
+                base.clearSessionID();
+            }
+            if (response.status >= 500 && response.status <= 600) {
+                throw new Error("Server error: " + response.status);
+            }
+            throw new Error("Unknown error: " + response.status);
+        });
+}
+
+export function SessionKeepalive() : Promise<LoginResponse> {
+    const options = {
+        method: "GET"
+    };
+    return fetch(`${base.urlBase}/1/session_keepalive`, base.addDefaults(options))
         .then(response => {
             if (response.status === 200) {
                 return response.json().then(data => {
@@ -22,6 +48,7 @@ export function Login(username: string, password:string) : Promise<LoginResponse
             }
             if (response.status === 401) {
                 throw new Error("Invalid username/password");
+                base.clearSessionID();
             }
             if (response.status >= 500 && response.status <= 600) {
                 throw new Error("Server error: " + response.status);

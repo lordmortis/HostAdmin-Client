@@ -33,7 +33,20 @@ export const reducer = createReducer(initialState)
             expiry: undefined,
             errors: [action.payload.error]
         }
-    });
+    }).handleAction(Actions.StillAlive, (state, action: ReturnType<typeof Actions.StillAlive>) => {
+        return {
+            ...state,
+            expiry: action.payload.expiry,
+        }
+    }).handleAction(Actions.LoggedOut, (state, action: ReturnType<typeof Actions.LoggedOut>) => {
+        return {
+            ...state,
+            busy: false,
+            username: undefined,
+            sessionID: undefined,
+            expiry: undefined,
+        }
+    })
 
 /*export const reducer: Reducer<Types.State> = (state = initialState, action): Types.State => {
     switch(action.type) {
