@@ -19,10 +19,20 @@ function* handleLogin(action: ReturnType<typeof Actions.Login>) {
 function* handleKeepAlive(action: ReturnType<typeof Actions.StillAlive>) {
     try {
         const interval = Interval.fromDateTimes(new Date(), action.payload.expiry);
-        yield SagaEffects.delay(interval.toDuration().milliseconds / 2);
+        yield SagaEffects.delay(interval.toDuration().milliseconds * 0.8);
         const data = yield SagaEffects.call(API.SessionKeepalive);
         yield SagaEffects.put(Actions.StillAlive(data.expiry));
         yield SagaEffects.put(Actions.KeepAlive(data.expiry));
+    } catch(error) {
+        console.log(error);
+        yield SagaEffects.put(Actions.LoggedOut());
+    }
+}
+
+function* handleLogout() {
+    try {
+        yield SagaEffects.call(API.Logout);
+        yield SagaEffects.put(Actions.LoggedOut());
     } catch(error) {
         console.log(error);
         yield SagaEffects.put(Actions.LoggedOut());
@@ -37,9 +47,14 @@ function* watchKeepAlive() {
     yield (SagaEffects.takeLatest(Types.ActionTypes.KEEP_ALIVE, handleKeepAlive));
 }
 
+function* watchLogout() {
+    yield (SagaEffects.takeLatest(Types.ActionTypes.LOGOUT, handleLogout));
+}
+
 export function* Sagas() {
     yield SagaEffects.all([
         SagaEffects.fork(watchLoginRequest),
         SagaEffects.fork(watchKeepAlive),
+        SagaEffects.fork(watchLogout),
     ]);
 }

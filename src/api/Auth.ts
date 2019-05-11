@@ -36,7 +36,7 @@ export function SessionKeepalive() : Promise<LoginResponse> {
     const options = {
         method: "GET"
     };
-    return fetch(`${base.urlBase}/1/session_keepalive`, base.addDefaults(options))
+    return fetch(`${base.urlBase}/1/auth/keepalive`, base.addDefaults(options))
         .then(response => {
             if (response.status === 200) {
                 return response.json().then(data => {
@@ -54,5 +54,16 @@ export function SessionKeepalive() : Promise<LoginResponse> {
                 throw new Error("Server error: " + response.status);
             }
             throw new Error("Unknown error: " + response.status);
+        });
+}
+
+export function Logout(): Promise<boolean> {
+    const options = {
+        method: "POST",
+    };
+    return fetch(`${base.urlBase}/1/auth/logout`, base.addDefaults(options))
+        .then(() => {
+            base.clearSessionID();
+            return true;
         });
 }

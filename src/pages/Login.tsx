@@ -83,6 +83,9 @@ class Login extends React.Component<AllProps, IState> {
     }
 
     render() {
+
+        const { busy, errors } = this.props;
+
         return (
             <Paper id="login">
                 <Typography variant="title">Login</Typography>
@@ -104,9 +107,9 @@ class Login extends React.Component<AllProps, IState> {
                         margin="normal"
                         type="password"
                     />
-                    {renderLogin(isValid(this.state), this.props.busy)}
+                    {renderLogin(isValid(this.state), busy)}
                 </form>
-                {renderErrors(this.props.errors)}
+                {renderErrors(errors)}
             </Paper>
         )
     }

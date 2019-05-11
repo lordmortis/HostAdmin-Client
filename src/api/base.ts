@@ -11,17 +11,17 @@ const baseDefaults = Object.freeze({
     referrer: "no-referrer"
 });
 
-let currentDefaults = Object.assign({}, baseDefaults);
+const currentDefaults = Object.assign({}, baseDefaults);
 
 export function setSessionID(sessionID: string) {
-    currentDefaults = Object.assign({}, baseDefaults);
     // @ts-ignore
     currentDefaults.headers["Authorization"] = `Bearer ${sessionID}`;
 }
 
 export function clearSessionID() {
-    currentDefaults = Object.assign({}, baseDefaults);
-    console.log("Current Defaults are:");
+    // @ts-ignore
+    delete(currentDefaults.headers["Authorization"]);
+    console.log("Current Defaults:");
     console.log(currentDefaults);
 }
 
