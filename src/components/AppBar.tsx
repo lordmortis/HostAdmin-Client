@@ -54,7 +54,7 @@ class AppBar extends React.Component<AllProps, IState> {
         const { username }: Readonly<AllProps> = this.props;
 
         return (
-            <Drawer anchor={"left"} open={menuVisible} onClose={this.handleLogout.bind(this)}>
+            <Drawer anchor={"left"} open={menuVisible} onClose={this.handleMenuToggle.bind(this)}>
                 <Typography key={"title"} align={"center"} variant={"title"} children={"Menu"}/>
                 <Typography key={"username"} align={"center"} children={username}/>
                 <Divider/>
