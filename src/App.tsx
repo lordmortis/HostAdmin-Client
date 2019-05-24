@@ -7,6 +7,7 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import {State as StoreState} from './store';
 
 import AppBar from './components/AppBar';
+import DomainsPage from './pages/Domains';
 import LoginPage from './pages/Login';
 
 interface IProps {
@@ -18,8 +19,8 @@ interface PropsFromState {
 }
 
 function renderPages(auth?: boolean) : ReactNode {
-    if (auth) return null;
-    return <LoginPage/>
+    if (auth) return <DomainsPage/>;
+    return <LoginPage/>;
 }
 
 const App: React.FC<IProps> = (props: IProps & PropsFromState) => {

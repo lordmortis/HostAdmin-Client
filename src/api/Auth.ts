@@ -22,8 +22,8 @@ export function Login(username: string, password:string) : Promise<LoginResponse
                 });
             }
             if (response.status === 401) {
-                throw new Error("Invalid username/password");
                 base.clearSessionID();
+                throw new Error("Invalid username/password");
             }
             if (response.status >= 500 && response.status <= 600) {
                 throw new Error("Server error: " + response.status);
@@ -47,8 +47,8 @@ export function SessionKeepalive() : Promise<LoginResponse> {
                 });
             }
             if (response.status === 401) {
-                throw new Error("Invalid username/password");
                 base.clearSessionID();
+                throw new Error("Invalid username/password");
             }
             if (response.status >= 500 && response.status <= 600) {
                 throw new Error("Server error: " + response.status);
