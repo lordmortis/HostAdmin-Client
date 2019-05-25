@@ -6,7 +6,7 @@ export const Login = createAction(Types.ActionTypes.LOGIN, action => {
 });
 
 export const LoggedIn = createAction(Types.ActionTypes.LOGGED_IN, action => {
-    return (sessionId: string, expiry: Date) => action({sessionId, expiry})
+    return (sessionId: string, expiry: Date, username?: string) => action({sessionId, expiry, username})
 });
 
 export const LoginError = createAction(Types.ActionTypes.LOGIN_ERROR, action => {

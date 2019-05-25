@@ -18,6 +18,11 @@ function* handleLogin(action: ReturnType<typeof Actions.Login>) {
 
 function* handleKeepAlive(action: ReturnType<typeof Actions.StillAlive>) {
     try {
+        const now = new Date();
+        if (now > action.payload.expiry) {
+            yield SagaEffects.put(Actions.Logout());
+            return;
+        }
         const interval = Interval.fromDateTimes(new Date(), action.payload.expiry);
         yield SagaEffects.delay(interval.toDuration().milliseconds * 0.8);
         const data = yield SagaEffects.call(API.SessionKeepalive);
@@ -25,7 +30,7 @@ function* handleKeepAlive(action: ReturnType<typeof Actions.StillAlive>) {
         yield SagaEffects.put(Actions.KeepAlive(data.expiry));
     } catch(error) {
         console.log(error);
-        yield SagaEffects.put(Actions.LoggedOut());
+        yield SagaEffects.put(Actions.Logout());
     }
 }
 

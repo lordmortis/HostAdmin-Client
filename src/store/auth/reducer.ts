@@ -5,10 +5,11 @@ import * as Types from './types'
 
 const initialState: Types.State = {
     busy: false,
+    expiry: undefined,
     sessionID: undefined,
     username: undefined,
     errors: [],
-}
+};
 
 export const reducer = createReducer(initialState)
     .handleAction(Actions.Login, (state, action: ReturnType<typeof Actions.Login>) => {
@@ -18,11 +19,13 @@ export const reducer = createReducer(initialState)
             username: action.payload.username,
         }
     }).handleAction(Actions.LoggedIn, (state, action: ReturnType<typeof Actions.LoggedIn>) => {
+        const newUsername = action.payload.username != null ? action.payload.username : state.username;
         return {
             ...state,
             busy: false,
             sessionID: action.payload.sessionId,
             expiry: action.payload.expiry,
+            username: newUsername,
         }
     }).handleAction(Actions.LoginError, (state, action: ReturnType<typeof Actions.LoginError>) => {
         return {

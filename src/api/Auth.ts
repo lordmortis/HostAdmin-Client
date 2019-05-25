@@ -5,6 +5,37 @@ export interface LoginResponse {
     sessionID: string,
 }
 
+function setLocalStorage(expiry: string, username?: string, sessionID?: string, ) {
+    if (localStorage == null) return;
+    if (sessionID !== undefined) localStorage.setItem("sessionID", sessionID);
+    if (username !== undefined) localStorage.setItem("sessionUsername", username);
+    localStorage.setItem("sessionExpiry", expiry);
+}
+
+function clearLocalStorage() {
+    if (localStorage == null) return;
+    ["sessionID", "sessionUsername", "sessionExpiry"].forEach((value => {
+        localStorage.removeItem(value);
+    }))
+}
+
+export function SavedUsername():string | null {
+    if (localStorage == null) return null;
+    return localStorage.getItem("sessionUsername");
+}
+
+export function SavedSession():LoginResponse | null {
+    if (localStorage == null) return null;
+    const expiryString = localStorage.getItem("sessionExpiry");
+    const sessionID = localStorage.getItem("sessionID");
+    if (expiryString == null || sessionID == null) return null;
+    base.setSessionID(sessionID);
+    return {
+        expiry: new Date(expiryString),
+        sessionID: sessionID,
+    }
+}
+
 export function Login(username: string, password:string) : Promise<LoginResponse> {
     const options = {
         method: "POST",
@@ -15,6 +46,7 @@ export function Login(username: string, password:string) : Promise<LoginResponse
             if (response.status === 200) {
                 return response.json().then(data => {
                     base.setSessionID(data.sessionID);
+                    setLocalStorage(data.expiry, username, data.sessionID);
                     return {
                         expiry: new Date(data.expiry),
                         sessionID: data.sessionID,
@@ -40,6 +72,7 @@ export function SessionKeepalive() : Promise<LoginResponse> {
         .then(response => {
             if (response.status === 200) {
                 return response.json().then(data => {
+                    setLocalStorage(data.expiry);
                     return {
                         expiry: new Date(data.expiry),
                         sessionID: data.sessionID,
@@ -64,6 +97,7 @@ export function Logout(): Promise<boolean> {
     return fetch(`${base.urlBase}/1/auth/logout`, base.addDefaults(options))
         .then(() => {
             base.clearSessionID();
+            clearLocalStorage();
             return true;
         });
 }
