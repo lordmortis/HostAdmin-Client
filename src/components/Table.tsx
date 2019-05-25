@@ -108,12 +108,45 @@ export default class CustomTable extends React.Component<Props, IState> {
         )
     }
 
+    private renderPagination():ReactNode {
+        const length = 100;
+        const { page, entriesPerPage} = this.state;
+
+        return (
+            <TablePagination
+                count={length}
+                onChangePage={this.changePage.bind(this)}
+                onChangeRowsPerPage={this.changeRowsPerPage.bind(this)}
+                page={page}
+                rowsPerPage={entriesPerPage}
+            />
+        )
+    }
+
+    private changePage(event: React.MouseEvent<HTMLButtonElement> | null, page: number) {
+        if (event != null) event.preventDefault();
+        this.setState({
+            ...this.state,
+            page: page
+        });
+    }
+
+    private changeRowsPerPage(event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) {
+        this.setState({
+            ...this.state,
+            entriesPerPage: parseInt(event.target.value, 10)
+        });
+    }
+
     render() {
         return (
-            <Table>
-                {this.renderHeader()}
-                {this.renderBody()}
-            </Table>
+            <div>
+                <Table>
+                    {this.renderHeader()}
+                    {this.renderBody()}
+                </Table>
+                {this.renderPagination()}
+            </div>
         )
     }
 }
