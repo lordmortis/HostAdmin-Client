@@ -1,6 +1,5 @@
 import React, {ReactNode} from "react";
 
-
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -12,15 +11,16 @@ import Typography from '@material-ui/core/Typography';
 interface Column {
     field: string;
     header: string;
+    loading?: boolean;
     headerFunc?: () => ReactNode;
     cellFunc?: (data: any) => ReactNode;
 }
 
 interface Props {
-    columns: Array<Column>
-    data?: Array<any>
-    fetchFunc?: (start: number, limit: number) => Array<any>
-    total?: number
+    columns: Array<Column>;
+    data: Array<any>;
+    fetchFunc?: (start: number, limit: number) => void;
+    total?: number;
 }
 
 interface IState {
@@ -38,12 +38,24 @@ export default class CustomTable extends React.Component<Props, IState> {
         }
     }
 
-    private getRenderData():Array<object> {
+    componentDidMount() {
+        this.getTableData();
+    }
+
+    private getTableData() {
+        if (this.props.fetchFunc === undefined) return;
+
+        const limit = this.state.entriesPerPage;
+        const startRow = this.state.page * limit;
+        this.props.fetchFunc(limit, startRow);
+    }
+
+    private getRenderData():Array<any> {
         const limit = this.state.entriesPerPage;
         const startRow = this.state.page * limit;
 
         if (this.props.fetchFunc != null) {
-            return this.props.fetchFunc(startRow, limit);
+            return this.props.data;
         } else if (this.props.data != null) {
             return this.props.data.slice(startRow, startRow + limit);
         }
@@ -129,6 +141,7 @@ export default class CustomTable extends React.Component<Props, IState> {
             ...this.state,
             page: page
         });
+        this.getTableData();
     }
 
     private changeRowsPerPage(event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) {
@@ -136,6 +149,7 @@ export default class CustomTable extends React.Component<Props, IState> {
             ...this.state,
             entriesPerPage: parseInt(event.target.value, 10)
         });
+        this.getTableData();
     }
 
     render() {
