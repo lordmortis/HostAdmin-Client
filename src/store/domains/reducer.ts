@@ -28,4 +28,20 @@ export const reducer = createReducer(initialState)
             busy: false,
             error: action.payload.error,
         }
+    }).handleAction(Actions.Save, (state, action: ReturnType<typeof Actions.Save>) => {
+        return {
+            ...state,
+            busy: true,
+        }
+    }).handleAction(Actions.Saved, (state, action: ReturnType<typeof Actions.Saved>) => {
+        return {
+            ...state,
+            busy: false,
+        }
+    }).handleAction(Actions.SaveError, (state, action: ReturnType<typeof Actions.SaveError>) => {
+        return {
+            ...state,
+            busy: false,
+            error: action.payload.error,
+        }
     });

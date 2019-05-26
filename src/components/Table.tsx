@@ -28,7 +28,7 @@ interface IState {
     entriesPerPage: number,
 }
 
-export default class CustomTable extends React.Component<Props, IState> {
+export default class CustomTable extends React.PureComponent<Props, IState> {
     constructor(props: Props) {
         super(props);
 

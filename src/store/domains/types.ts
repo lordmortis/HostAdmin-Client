@@ -3,7 +3,10 @@ import {DomainModel} from '../../api/Domains'
 export enum ActionTypes {
     FETCH = 'domains/Fetch',
     FETCHED = 'domain/Fetched',
-    FETCHERROR = 'domain/FetchError',
+    FETCH_ERROR = 'domain/FetchError',
+    SAVE = 'domains/Save',
+    SAVED = 'domains/Saved',
+    SAVE_ERROR = 'domains/SaveError',
 }
 
 export interface State {

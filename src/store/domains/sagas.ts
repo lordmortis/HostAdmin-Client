@@ -15,12 +15,27 @@ function* handleFetch(action: ReturnType<typeof Actions.Fetch>) {
     }
 }
 
+function* handleSave(action: ReturnType<typeof Actions.Save>) {
+    try {
+        yield SagaEffects.call(API.CreateOrUpdate, action.payload.data)
+        yield SagaEffects.put(Actions.Saved());
+        //TODO: need to update the list
+    } catch (error) {
+        yield SagaEffects.put(Actions.SaveError(error));
+    }
+}
+
 function* watchFetch() {
     yield (SagaEffects.takeLatest(Types.ActionTypes.FETCH, handleFetch));
+}
+
+function* watchSave() {
+    yield (SagaEffects.takeLatest(Types.ActionTypes.SAVE, handleSave));
 }
 
 export function* Sagas() {
     yield SagaEffects.all([
         SagaEffects.fork(watchFetch),
+        SagaEffects.fork(watchSave),
     ]);
 }

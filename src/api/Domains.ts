@@ -1,10 +1,10 @@
 import * as base from './base'
 
 export interface DomainModel {
-    id: string;
+    id?: string;
     name: string;
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt?: Date;
+    updatedAt?: Date;
 }
 
 export interface DomainListResponse {
@@ -44,13 +44,15 @@ export function List(offset: number, limit: number) : Promise<DomainListResponse
 
 }*/
 
-export function Create(name: string) : Promise<DomainModel> {
+export function CreateOrUpdate(data: DomainModel) : Promise<DomainModel> {
     const options = {
-        method: "POST",
-        body: JSON.stringify({name: name})
+        method: data.id === undefined ? "POST" : "PUT",
+        body: JSON.stringify(data)
     };
 
-    return fetch(base.urlBase + "/1/domains", base.addDefaults(options))
+    const urlPath = data.id === undefined ? "/1/domains" : `/1/domains/${data.id}/`;
+
+    return fetch(base.urlBase + urlPath, base.addDefaults(options))
         .then(response => {
             if (response.status !== 200) {
                 throw new Error("Server Error: " + response.status);
