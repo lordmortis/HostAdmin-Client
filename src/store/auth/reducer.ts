@@ -49,7 +49,7 @@ export const reducer = createReducer(initialState)
             sessionID: undefined,
             expiry: undefined,
         }
-    })
+    });
 
 /*export const reducer: Reducer<Types.State> = (state = initialState, action): Types.State => {
     switch(action.type) {
