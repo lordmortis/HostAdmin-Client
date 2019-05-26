@@ -20,7 +20,7 @@ interface Props {
     columns: Array<Column>;
     data: Array<any>;
     fetchFunc?: (start: number, limit: number) => void;
-    total?: number;
+    totalRecords?: number;
 }
 
 interface IState {
@@ -121,12 +121,16 @@ export default class CustomTable extends React.Component<Props, IState> {
     }
 
     private renderPagination():ReactNode {
-        const length = 100;
+        let totalRecords = this.props.data.length;
+        if (this.props.fetchFunc !== undefined && this.props.totalRecords !== undefined) {
+            totalRecords = this.props.totalRecords;
+        }
+
         const { page, entriesPerPage} = this.state;
 
         return (
             <TablePagination
-                count={length}
+                count={totalRecords}
                 onChangePage={this.changePage.bind(this)}
                 onChangeRowsPerPage={this.changeRowsPerPage.bind(this)}
                 page={page}

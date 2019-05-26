@@ -12,6 +12,15 @@ export interface DomainListResponse {
     totalRecords: number;
 }
 
+function parseModel(data: any):DomainModel {
+    return {
+        id: data.id,
+        name: data.name,
+        createdAt: new Date(data.created_at),
+        updatedAt: new Date(data.updated_at),
+    }
+}
+
 export function List(offset: number, limit: number) : Promise<DomainListResponse> {
     const options = {
         method: "GET"
@@ -22,25 +31,32 @@ export function List(offset: number, limit: number) : Promise<DomainListResponse
             if (response.status !== 200) {
                 throw new Error("Server Error: " + response.status);
             }
-            return response.json().then(dataArray => {
-                const array = [];
-                for (let index in dataArray) {
-                    const data = dataArray[index];
-                    array.push({
-                        id: data.id,
-                        name: data.name,
-                        createdAt: new Date(data.created_at),
-                        updatedAt: new Date(data.updated_at),
-                    })
-                }
+            return response.json().then(decodedResponse => {
                 return {
-                    data: array,
-                    totalRecords: 100,
+                    data: decodedResponse.models.map(parseModel),
+                    totalRecords: decodedResponse.meta.total,
                 }
-            })
-        });
+            });
+    });
 }
 
 /*export function Get(id: string) : Promise<DomainResponse> {
 
 }*/
+
+export function Create(name: string) : Promise<DomainModel> {
+    const options = {
+        method: "POST",
+        body: JSON.stringify({name: name})
+    };
+
+    return fetch(base.urlBase + "/1/domains", base.addDefaults(options))
+        .then(response => {
+            if (response.status !== 200) {
+                throw new Error("Server Error: " + response.status);
+            }
+            return response.json().then(decodedResponse => {
+                return parseModel(decodedResponse);
+            });
+    });
+}
