@@ -16,13 +16,13 @@ export const FetchError = createAction(Types.ActionTypes.FETCH_ERROR, action => 
 });
 
 export const Save = createAction(Types.ActionTypes.SAVE, action => {
-    return (data: DomainModel) => action({data})
+    return (data: DomainModel, offset: number, limit: number) => action({data, offset, limit})
 });
 
-export const Saved = createAction(Types.ActionTypes.SAVE_ERROR, action => {
+export const Saved = createAction(Types.ActionTypes.SAVED, action => {
     return () => action({})
 });
 
-export const SaveError = createAction(Types.ActionTypes.SAVED, action => {
+export const SaveError = createAction(Types.ActionTypes.SAVE_ERROR, action => {
     return (error: string) => action({error})
 });

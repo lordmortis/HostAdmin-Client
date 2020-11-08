@@ -18,6 +18,8 @@ interface PropsFromState {
     loading: boolean;
     tableData: Array<TableModel>;
     totalRecords: number,
+    offset: number,
+    limit: number,
 }
 
 interface PropsFromDispatch {
@@ -38,7 +40,7 @@ const columns = [
     {
         field: "actions", header: "Actions and a long long thing here", cellFunc: (data:any) => {
             return (
-                <Typography>Ya mama {data.name}</Typography>
+                <Typography>Ya uncle {data.name}</Typography>
             )
         }
     }
@@ -58,8 +60,8 @@ class Domains extends React.PureComponent<AllProps, IState> {
     }
 
 
-    private handleFetch(start: number, limit: number) {
-        this.props.doFetch(start, limit);
+    private handleFetch(offset: number, limit: number) {
+        this.props.doFetch(offset, limit);
     }
 
     private handleCreate(event: React.FormEvent) {
@@ -96,7 +98,7 @@ class Domains extends React.PureComponent<AllProps, IState> {
             id: newValues["id"],
             // @ts-ignore
             name: newValues["name"],
-        });
+        }, 0, 10);
         this.setState({
             ...this.state,
             editingModel: undefined,
@@ -132,7 +134,12 @@ class Domains extends React.PureComponent<AllProps, IState> {
                     variant={"raised"}
                 />
                 {this.renderEditDialog()}
-                <Table columns={columns} data={this.props.tableData} fetchFunc={this.handleFetch.bind(this)}>
+                <Table
+                    columns={columns}
+                    data={this.props.tableData}
+                    fetchFunc={this.handleFetch.bind(this)}
+                    offset={this.props.offset}
+                    limit={this.props.limit}>
                 </Table>
             </Paper>
         );
@@ -144,13 +151,15 @@ function mapStateToProps(state: StoreState):PropsFromState {
         loading: state.domains.busy,
         tableData: state.domains.data,
         totalRecords: state.domains.totalLength,
+        limit: state.domains.limit,
+        offset: state.domains.offset,
     }
 }
 
 function mapDispatchToProps(dispatch: Dispatch):PropsFromDispatch {
     return {
         doFetch: (offset: number, limit: number) => dispatch(Actions.Fetch(offset, limit)),
-        doSave: (data: TableModel) => dispatch(Actions.Save(data)),
+        doSave: (data: TableModel, offset: number, limit: number) => dispatch(Actions.Save(data, offset, limit)),
     }
 }
 

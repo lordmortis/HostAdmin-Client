@@ -13,5 +13,7 @@ export interface State {
     readonly busy: boolean,
     readonly data: Array<DomainModel>,
     readonly totalLength: number,
+    readonly limit: number,
+    readonly offset: number,
 }
 

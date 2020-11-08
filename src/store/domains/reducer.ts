@@ -7,13 +7,17 @@ const initialState: Types.State = {
     busy: false,
     data: [],
     totalLength: 0,
+    limit: 10,
+    offset: 0,
 };
 
 export const reducer = createReducer(initialState)
-    .handleAction(Actions.Fetch, (state) => {
+    .handleAction(Actions.Fetch, (state, action: ReturnType<typeof Actions.Fetch>) => {
         return {
             ...state,
             busy: true,
+            limit: action.payload.limit,
+            offset: action.payload.offset,
         }
     }).handleAction(Actions.Fetched, (state, action: ReturnType<typeof Actions.Fetched>) => {
         return {

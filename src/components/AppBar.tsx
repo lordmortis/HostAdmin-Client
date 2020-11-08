@@ -22,7 +22,11 @@ interface PropsFromDispatch {
     doLogout: typeof Actions.Logout
 }
 
-type AllProps = PropsFromState & PropsFromDispatch
+interface PropsFromReact {
+    children: React.ReactNode
+}
+
+type AllProps = PropsFromState & PropsFromDispatch & PropsFromReact
 
 interface IState {
     menuVisible: boolean
@@ -84,7 +88,7 @@ class AppBar extends React.Component<AllProps, IState> {
                         <Toolbar>
                             {this.renderMenuIcon()}
                             <Typography variant="h6" color="inherit">
-                                Admin System
+                                {this.props.children}
                             </Typography>
                         </Toolbar>
                     </MUIAppBar>

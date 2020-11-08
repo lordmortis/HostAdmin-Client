@@ -19,45 +19,29 @@ interface Column {
 interface Props {
     columns: Array<Column>;
     data: Array<any>;
-    fetchFunc?: (start: number, limit: number) => void;
+    fetchFunc?: (offset: number, limit: number) => void;
     totalRecords?: number;
+    offset: number;
+    limit: number;
 }
 
-interface IState {
-    page: number,
-    entriesPerPage: number,
-}
-
-export default class CustomTable extends React.PureComponent<Props, IState> {
-    constructor(props: Props) {
-        super(props);
-
-        this.state = {
-            page: 0,
-            entriesPerPage: 10,
-        }
-    }
-
+export default class CustomTable extends React.PureComponent<Props> {
     componentDidMount() {
-        this.getTableData();
+        this.getTableData(this.props.offset, this.props.limit);
     }
 
-    private getTableData() {
+    private getTableData(offset: number, limit: number) {
         if (this.props.fetchFunc === undefined) return;
-
-        const limit = this.state.entriesPerPage;
-        const startRow = this.state.page * limit;
-        this.props.fetchFunc(limit, startRow);
+        this.props.fetchFunc(offset, limit);
     }
 
     private getRenderData():Array<any> {
-        const limit = this.state.entriesPerPage;
-        const startRow = this.state.page * limit;
+        const { limit, offset } = this.props
 
         if (this.props.fetchFunc != null) {
             return this.props.data;
         } else if (this.props.data != null) {
-            return this.props.data.slice(startRow, startRow + limit);
+            return this.props.data.slice(limit, offset + limit);
         }
 
         return [];
@@ -126,7 +110,8 @@ export default class CustomTable extends React.PureComponent<Props, IState> {
             totalRecords = this.props.totalRecords;
         }
 
-        const { page, entriesPerPage} = this.state;
+        const entriesPerPage = this.props.limit;
+        const page = this.props.offset / entriesPerPage;
 
         return (
             <TablePagination
@@ -141,19 +126,11 @@ export default class CustomTable extends React.PureComponent<Props, IState> {
 
     private changePage(event: React.MouseEvent<HTMLButtonElement> | null, page: number) {
         if (event != null) event.preventDefault();
-        this.setState({
-            ...this.state,
-            page: page
-        });
-        this.getTableData();
+        this.getTableData(this.props.limit * page, this.props.limit);
     }
 
     private changeRowsPerPage(event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) {
-        this.setState({
-            ...this.state,
-            entriesPerPage: parseInt(event.target.value, 10)
-        });
-        this.getTableData();
+        this.getTableData(this.props.offset, parseInt(event.target.value, 10));
     }
 
     render() {

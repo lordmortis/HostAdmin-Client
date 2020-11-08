@@ -29,7 +29,7 @@ const App: React.FC<IProps> = (props: IProps & PropsFromState) => {
             <ReduxProvider store={props.store}>
                 <CssBaseline/>
                 <div className="App">
-                    <AppBar>HostAdmin</AppBar>
+                    <AppBar>Admin System</AppBar>
                     {renderPages(props.auth)}
                 </div>
             </ReduxProvider>

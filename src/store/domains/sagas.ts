@@ -19,7 +19,9 @@ function* handleSave(action: ReturnType<typeof Actions.Save>) {
     try {
         yield SagaEffects.call(API.CreateOrUpdate, action.payload.data)
         yield SagaEffects.put(Actions.Saved());
-        //TODO: need to update the list
+        const { offset, limit } = action.payload;
+        const data = yield SagaEffects.call(API.List, offset, limit);
+        yield SagaEffects.put(Actions.Fetched(data.data, data.totalRecords))
     } catch (error) {
         yield SagaEffects.put(Actions.SaveError(error));
     }
