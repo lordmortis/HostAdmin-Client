@@ -1,6 +1,7 @@
 import React from 'react';
 import { Dispatch } from 'redux';
 import { connect } from 'react-redux';
+import { withRouter, RouteComponentProps } from 'react-router-dom';
 
 import Divider from "@material-ui/core/Divider";
 import Drawer  from "@material-ui/core/Drawer";
@@ -26,7 +27,7 @@ interface PropsFromReact {
     children: React.ReactNode
 }
 
-type AllProps = PropsFromState & PropsFromDispatch & PropsFromReact
+type AllProps = PropsFromState & PropsFromDispatch & PropsFromReact & RouteComponentProps
 
 interface IState {
     menuVisible: boolean
@@ -52,6 +53,20 @@ class AppBar extends React.Component<AllProps, IState> {
         )
     }
 
+    private renderSectionButton(path: string, name: string): React.ReactNode {
+        const absPath = `/${path}`;
+        const showing = this.props.location.pathname.startsWith(absPath);
+        const urlPush = () => {
+            this.props.history.push(absPath);
+            this.setState({menuVisible: false});
+        }
+        return (
+            <MenuItem key={path} disabled={showing} onClick={urlPush}>
+                {name}
+            </MenuItem>
+        );
+    }
+
     private renderMenu(): React.ReactNode {
         const { menuVisible }: Readonly<IState> = this.state;
 
@@ -61,6 +76,9 @@ class AppBar extends React.Component<AllProps, IState> {
             <Drawer anchor={"left"} open={menuVisible} onClose={this.handleMenuToggle.bind(this)}>
                 <Typography key={"title"} align={"center"} variant={"title"} children={"Menu"}/>
                 <Typography key={"username"} align={"center"} children={username}/>
+                <Divider/>
+                {this.renderSectionButton("domains", "Domains")}
+                {this.renderSectionButton("users", "Users")}
                 <Divider/>
                 <MenuItem key={"logout"} onClick={this.handleLogout.bind(this)} children={"Log Out"}/>
             </Drawer>
@@ -113,4 +131,4 @@ function mapDispatchToProps(dispatch: Dispatch):PropsFromDispatch {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(AppBar);
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(AppBar));

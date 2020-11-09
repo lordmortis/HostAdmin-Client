@@ -1,6 +1,9 @@
 import React, {ReactNode} from 'react';
 import { Store } from 'redux'
 import { Provider as ReduxProvider, connect } from 'react-redux';
+import { ConnectedRouter } from 'connected-react-router'
+import { History } from "history";
+import { Route, Switch } from 'react-router-dom';
 
 import CssBaseline from '@material-ui/core/CssBaseline';
 
@@ -11,7 +14,8 @@ import DomainsPage from './pages/Domains';
 import LoginPage from './pages/Login';
 
 interface IProps {
-    store: Store<StoreState>,
+    store: Store<StoreState>
+    history: History
 }
 
 interface PropsFromState {
@@ -19,19 +23,32 @@ interface PropsFromState {
 }
 
 function renderPages(auth?: boolean) : ReactNode {
-    if (auth) return <DomainsPage/>;
-    return <LoginPage/>;
+    if (!auth) {
+        return <LoginPage/>;
+    }
+
+    const routes = [];
+
+    routes.push(<Route key="domains" path="/domains" component={DomainsPage}/>);
+
+    return (
+        <Switch>
+            {routes}
+        </Switch>
+    )
 }
 
 const App: React.FC<IProps> = (props: IProps & PropsFromState) => {
     return (
         <div>
             <ReduxProvider store={props.store}>
-                <CssBaseline/>
-                <div className="App">
-                    <AppBar>Admin System</AppBar>
-                    {renderPages(props.auth)}
-                </div>
+                <ConnectedRouter history={props.history}>
+                    <CssBaseline/>
+                    <div className="App">
+                        <AppBar>Admin System</AppBar>
+                        {renderPages(props.auth)}
+                    </div>
+                </ConnectedRouter>
             </ReduxProvider>
         </div>
     );

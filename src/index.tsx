@@ -5,7 +5,7 @@ import './index.css';
 import * as serviceWorker from './serviceWorker';
 
 import App from './App';
-import createStore from './store/create';
+import createStore, {history} from './store/create';
 
 import * as Auth from './api/Auth'
 import * as AuthActions from './store/auth/actions'
@@ -21,7 +21,7 @@ if (savedSession != null) {
     }
 }
 
-ReactDOM.render(<App store={store}/>, document.getElementById('root'));
+ReactDOM.render(<App store={store} history={history}/>, document.getElementById('root'));
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

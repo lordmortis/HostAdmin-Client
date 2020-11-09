@@ -1,12 +1,17 @@
-import { Store, createStore, applyMiddleware, compose } from "redux";
+import { Store, createStore, applyMiddleware, compose } from "redux"
+import { createBrowserHistory } from 'history'
+import { routerMiddleware } from "connected-react-router";
 import createSagaMiddleware from 'redux-saga'
 
 import * as AppStore from './index'
 
+export const history = createBrowserHistory()
+
 export default function(initialState?: AppStore.State):Store<AppStore.State> {
     const sagaMiddleware = createSagaMiddleware()
-    const combinedReducer = AppStore.createRootReducer();
+    const combinedReducer = AppStore.createRootReducer(history);
     const appliedMiddleware = applyMiddleware(
+        routerMiddleware(history),
         sagaMiddleware,
     );
 
