@@ -12,6 +12,7 @@ import {State as StoreState} from './store';
 import AppBar from './components/AppBar';
 import DomainsPage from './pages/Domains';
 import LoginPage from './pages/Login';
+import UsersPage from './pages/Users';
 
 interface IProps {
     store: Store<StoreState>
@@ -30,6 +31,7 @@ function renderPages(auth?: boolean) : ReactNode {
     const routes = [];
 
     routes.push(<Route key="domains" path="/domains" component={DomainsPage}/>);
+    routes.push(<Route key="users" path="/users" component={UsersPage}/>);
 
     return (
         <Switch>
