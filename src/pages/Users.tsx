@@ -40,9 +40,20 @@ const columns = [
         field: "email", header: "Email"
     },
     {
-        field: "actions", header: "Actions and a long long thing here", cellFunc: (data:any) => {
+        field: "superAdmin", header: "Super Admin"
+    },
+    {
+        field: "actions", header: "Actions and a long long thing here", cellFunc: function(data:any) {
             return (
-                <Typography>Ya uncle {data.name}</Typography>
+                <div>
+                    <Button
+                        // @ts-ignore
+                        onClick={this.handleEdit.bind(this, data)}
+                        variant={"raised"}
+                        children={"Edit"}
+                        key="edit"
+                    />
+                </div>
             )
         }
     }
@@ -51,6 +62,9 @@ const columns = [
 const fields = [
     { field: "username", header: "Username", type: "string" },
     { field: "email", header: "Email", type: "string" },
+    { field: "superAdmin", header: "Super Admin", type: "boolean" },
+    { field: "newPassword", header: "Password", type: "password" },
+    { field: "passwordConfirmation", header: "Password Confirmation", type: "password" },
 ];
 
 class Users extends React.PureComponent<AllProps, IState> {
@@ -62,7 +76,6 @@ class Users extends React.PureComponent<AllProps, IState> {
         }
     }
 
-
     private handleFetch(offset: number, limit: number) {
         this.props.doFetch(offset, limit);
     }
@@ -73,6 +86,14 @@ class Users extends React.PureComponent<AllProps, IState> {
             ...this.state,
             editingModel: {
             }
+        })
+    }
+
+    handleEdit(model: any, event: React.FormEvent, ) {
+        event.preventDefault();
+        this.setState({
+            ...this.state,
+            editingModel: model
         })
     }
 
@@ -96,12 +117,8 @@ class Users extends React.PureComponent<AllProps, IState> {
     private handleModelEditSave() {
         const newValues = this.state.editingModel;
         if (newValues === undefined) return;
-        this.props.doSave({
-            // @ts-ignore
-            id: newValues["id"],
-            // @ts-ignore
-            name: newValues["name"],
-        }, 0, 10);
+        // @ts-ignore
+        this.props.doSave(newValues,0, 10);
         this.setState({
             ...this.state,
             editingModel: undefined,
@@ -124,10 +141,6 @@ class Users extends React.PureComponent<AllProps, IState> {
     }
 
     render() {
-
-        console.log("Rendering Domains Page");
-        console.log(this.state);
-
         return (
             <Paper id="domains">
                 <Typography variant="title">Users</Typography>
@@ -138,6 +151,7 @@ class Users extends React.PureComponent<AllProps, IState> {
                 />
                 {this.renderEditDialog()}
                 <Table
+                    context={this}
                     columns={columns}
                     data={this.props.tableData}
                     fetchFunc={this.handleFetch.bind(this)}

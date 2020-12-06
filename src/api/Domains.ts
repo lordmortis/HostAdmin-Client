@@ -50,7 +50,7 @@ export function CreateOrUpdate(data: DomainModel) : Promise<DomainModel> {
         body: JSON.stringify(data)
     };
 
-    const urlPath = data.id === undefined ? "/1/domains" : `/1/domain/${data.id}/`;
+    const urlPath = data.id === undefined ? "/1/domains" : `/1/domain/${data.id}`;
 
     return fetch(base.urlBase + urlPath, base.addDefaults(options))
         .then(response => {
