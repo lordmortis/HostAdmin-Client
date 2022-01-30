@@ -116,7 +116,7 @@ export default class CustomTable extends React.PureComponent<Props> {
         return (
             <TablePagination
                 count={totalRecords}
-                onChangePage={this.changePage.bind(this)}
+                onPageChange={this.changePage.bind(this)}
                 onChangeRowsPerPage={this.changeRowsPerPage.bind(this)}
                 page={page}
                 rowsPerPage={entriesPerPage}

@@ -74,7 +74,7 @@ class AppBar extends React.Component<AllProps, IState> {
 
         return (
             <Drawer anchor={"left"} open={menuVisible} onClose={this.handleMenuToggle.bind(this)}>
-                <Typography key={"title"} align={"center"} variant={"title"} children={"Menu"}/>
+                <Typography key={"title"} align={"center"} variant={"h1"} children={"Menu"}/>
                 <Typography key={"username"} align={"center"} children={username}/>
                 <Divider/>
                 {this.renderSectionButton("domains", "Domains")}

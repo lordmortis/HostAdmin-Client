@@ -130,11 +130,11 @@ class Users extends React.PureComponent<AllProps, IState> {
 
         return (
             <Paper id="users">
-                <Typography variant="title">Users</Typography>
+                <Typography variant={"h1"}>Users</Typography>
                 <Button
                     children="Create"
                     onClick={this.handleCreate.bind(this)}
-                    variant={"raised"}
+                    variant={"contained"}
                 />
                 {this.renderEditDialog()}
                 <Table

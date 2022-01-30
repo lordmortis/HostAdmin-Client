@@ -88,7 +88,7 @@ class Login extends React.Component<AllProps, IState> {
 
         return (
             <Paper id="login">
-                <Typography variant="title">Login</Typography>
+                <Typography variant="h1">Login</Typography>
                 <form className="form" autoComplete="false" onSubmit={this.handleSubmit.bind(this)}>
                     <TextField
                         id="username"

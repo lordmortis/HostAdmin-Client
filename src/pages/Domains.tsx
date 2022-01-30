@@ -127,11 +127,11 @@ class Domains extends React.PureComponent<AllProps, IState> {
 
         return (
             <Paper id="domains">
-                <Typography variant="title">Domains</Typography>
+                <Typography variant="h1">Domains</Typography>
                 <Button
                     children="Create"
                     onClick={this.handleCreate.bind(this)}
-                    variant={"raised"}
+                    variant={"contained"}
                 />
                 {this.renderEditDialog()}
                 <Table
