@@ -1,15 +1,16 @@
 import React, { ReactNode } from "react";
 
 import Button from '@material-ui/core/Button';
-import Checkbox from "@material-ui/core/Checkbox";
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import FormControl from "@material-ui/core/FormControl";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
+import FormLabel from "@material-ui/core/FormLabel";
 import TextField from '@material-ui/core/TextField';
+import Checkbox from '@material-ui/core/Checkbox';
 import Typography from "@material-ui/core/Typography";
+
 
 interface Field {
     field: string,
@@ -35,58 +36,67 @@ interface IState {
 
 }
 
-function updateField(update: FieldUpdateFunc, field:string, event: any):void {
+function updateFromFieldWithValue(update: FieldUpdateFunc, field:string, event: React.ChangeEvent<HTMLTextAreaElement>):void {
     if (event.preventDefault !== undefined) event.preventDefault();
-    switch(event.target.type) {
-        case "text":
-        case "password":
-            update(field, event.target.value);
-            break;
-        case "checkbox":
-            update(field, event.target.checked);
-            break;
-        default:
-            console.error(`Unable to update field ${field} unknown field type ${event.target.type}`);
-            console.error(event.target);
-    }
+    update(field, event.target.value);
 }
 
-function renderFormControl(fieldData: Field, child: ReactNode):ReactNode {
-    return <FormControl key={fieldData.field} children={child}/>;
+function updateFromCheckboxField(update: FieldUpdateFunc, field:string, event: React.ChangeEvent<HTMLInputElement>, checked: boolean):void {
+    if (event.preventDefault !== undefined) event.preventDefault();
+    console.log(`checked? ${checked}`)
+    update(field, checked);
 }
 
 function renderField(disabled: boolean, modelData: any, update: FieldUpdateFunc, fieldData: Field):ReactNode {
 
     const fieldValue = modelData[fieldData.field];
 
+    let data = null;
+
     switch(fieldData.type) {
-        case "boolean":
-            return <FormControlLabel
-                    control={
-                        <Checkbox
-                            checked={fieldValue === undefined ? false : fieldValue}
-                            onChange={updateField.bind(null, update, fieldData.field)}
-                            color="primary"
-                        />
-                    }
-                    label={fieldData.header}
-                />;
-        case "string":
-        case "password":
-            return renderFormControl(
-                fieldData,
-                <TextField
+        case "bool":
+            data = [];
+            data.push(
+                <Checkbox
+                key="checkbox"
+                id={fieldData.field}
+                disabled={disabled}
+                checked={fieldValue === undefined ? "" : fieldValue}
+                onChange={updateFromCheckboxField.bind(null, update, fieldData.field)}
+            />);
+            data.push(
+                <FormLabel
+                    key="label"
                     id={fieldData.field}
                     disabled={disabled}
-                    label={fieldData.header}
-                    type={fieldData.type === "password" ? "password" : "text"}
-                    value={fieldValue === undefined ? "" : fieldValue}
-                    onChange={updateField.bind(null, update, fieldData.field)}
+                    children={fieldData.header}
                 />);
+            break;
+        case "string":
+            data = <TextField
+                id={fieldData.field}
+                disabled={disabled}
+                label={fieldData.header}
+                type="text"
+                value={fieldValue === undefined ? "" : fieldValue}
+                onChange={updateFromFieldWithValue.bind(null, update, fieldData.field)}
+            />;
+            break;
+        case "password":
+            data = <TextField
+                id={fieldData.field}
+                disabled={disabled}
+                label={fieldData.header}
+                type="password"
+                value={fieldValue === undefined ? "" : fieldValue}
+                onChange={updateFromFieldWithValue.bind(null, update, fieldData.field)}
+            />;
+            break;
         default:
-            return <Typography children={`Unknown Field type ${fieldData.type}`}/>
+            data = <Typography children={`Unknown Field type ${fieldData.type}`}/>
+            break;
     }
-
+    return <FormControl key={fieldData.field} children={data}/>;
 }
 
 export default class EditModel extends React.Component<Props, IState> {

@@ -17,7 +17,6 @@ interface Column {
 }
 
 interface Props {
-    context?: Object;
     columns: Array<Column>;
     data: Array<any>;
     fetchFunc?: (offset: number, limit: number) => void;
@@ -91,29 +90,19 @@ export default class CustomTable extends React.PureComponent<Props> {
     private renderRow(row: any):ReactNode {
         // @ts-ignore
         const key = row.id != null ? row.id : "unknown_key";
-        const cells = this.props.columns.map(column => { return this.renderCell(row, column); });
+        const cells = this.props.columns.map(column => {
+            // @ts-ignore
+            return (
+               <TableCell key={column.field}>
+                   {column.cellFunc != null ? column.cellFunc(row) : row[column.field]}
+               </TableCell>
+           )
+        });
+
         return (
             <TableRow key={key} children={cells}/>
         )
     }
-
-    private renderCell(row: any, column: any): ReactNode {
-        if (column.cellFunc != null) {
-            const { context } = this.props;
-            const cellData = context != null ? column.cellFunc.apply(context, [row]) : column.cellFunc(row);
-            return <TableCell key={column.field}>{cellData}</TableCell>;
-        }
-
-        const value = row[column.field];
-        const valueType = typeof(value);
-        switch (valueType) {
-            case "string":
-                return <TableCell key={column.field}>{value}</TableCell>;
-            case "boolean":
-                return <TableCell key={column.field}><Typography children={value ? "Yes" : "No"}/></TableCell>;
-        }
-        return <TableCell key={column.field}><Typography children={`Unknown type: ${valueType}`}/></TableCell>;
-}
 
     private renderPagination():ReactNode {
         let totalRecords = this.props.data.length;
