@@ -7,10 +7,15 @@ import Divider from "@material-ui/core/Divider";
 import Drawer  from "@material-ui/core/Drawer";
 import IconButton from "@material-ui/core/IconButton";
 import MenuIcon from '@material-ui/icons/Menu';
-import MenuItem from "@material-ui/core/MenuItem";
 import MUIAppBar from '@material-ui/core/AppBar'
+import List from '@material-ui/core/List'
+import ListItem from '@material-ui/core/ListItem'
+import ListItemIcon from '@material-ui/core/ListItemIcon'
+import ListItemText from '@material-ui/core/ListItemText'
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
+
+import { ExitToApp as IconExitToApp, People as IconPeople, Dns as IconDNS } from '@material-ui/icons'
 
 import * as Actions from '../store/auth/actions'
 import { State as StoreState } from '../store/index'
@@ -53,17 +58,24 @@ class AppBar extends React.Component<AllProps, IState> {
         )
     }
 
-    private renderSectionButton(path: string, name: string): React.ReactNode {
+    private renderSectionButton(path: string, name: string, icon?: React.ReactNode): React.ReactNode {
         const absPath = `/${path}`;
         const showing = this.props.location.pathname.startsWith(absPath);
+        const children = []
+
         const urlPush = () => {
             this.props.history.push(absPath);
             this.setState({menuVisible: false});
         }
+
+        if (icon != null) {
+            children.push(<ListItemIcon>{icon}</ListItemIcon>)
+        }
+
+        children.push(<ListItemText children={name}/>)
+
         return (
-            <MenuItem key={path} disabled={showing} onClick={urlPush}>
-                {name}
-            </MenuItem>
+            <ListItem button key={path} selected={showing} children={children} onClick={urlPush.bind(this)}/>
         );
     }
 
@@ -74,13 +86,17 @@ class AppBar extends React.Component<AllProps, IState> {
 
         return (
             <Drawer anchor={"left"} open={menuVisible} onClose={this.handleMenuToggle.bind(this)}>
-                <Typography key={"title"} align={"center"} variant={"h1"} children={"Menu"}/>
+                <Typography key={"title"} align={"center"} variant={"h3"} children={"Menu"}/>
                 <Typography key={"username"} align={"center"} children={username}/>
                 <Divider/>
-                {this.renderSectionButton("domains", "Domains")}
-                {this.renderSectionButton("users", "Users")}
-                <Divider/>
-                <MenuItem key={"logout"} onClick={this.handleLogout.bind(this)} children={"Log Out"}/>
+                <List>
+                    {this.renderSectionButton("domains", "Domains", <IconDNS/>)}
+                    {this.renderSectionButton("users", "Users", <IconPeople/>)}
+                    <ListItem button key={"logout"}>
+                        <ListItemIcon><IconExitToApp/></ListItemIcon>
+                        <ListItemText>Logout</ListItemText>
+                    </ListItem>
+                </List>
             </Drawer>
         )
     }

@@ -130,7 +130,7 @@ class Users extends React.PureComponent<AllProps, IState> {
 
         return (
             <Paper id="users">
-                <Typography variant={"h1"}>Users</Typography>
+                <Typography variant={"h2"}>Users</Typography>
                 <Button
                     children="Create"
                     onClick={this.handleCreate.bind(this)}
