@@ -31,7 +31,7 @@ const fields = [
 
 function generateShowDomain(id:string, navigator:NavigateFunction) {
   return function() {
-    navigator(`/domain/${id}/`)
+    navigator(`/domain/${id}`)
   }
 }
 
