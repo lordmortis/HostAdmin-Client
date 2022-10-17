@@ -1,5 +1,5 @@
 import React from 'react';
-import { Dispatch } from 'redux';
+import { Dispatch as ReduxDispatch } from 'redux';
 import { connect } from 'react-redux';
 
 import Button from '@material-ui/core/Button';
@@ -10,9 +10,9 @@ import Typography from '@material-ui/core/Typography';
 import * as Actions from '../store/auth/actions'
 import { State as StoreState } from '../store/index'
 
-function isValid(state:IState): boolean {
-    if (state.username.length < 3) return false;
-    if (state.password.length < 4) return false;
+function isValid(username: string, password: string): boolean {
+    if (username.length < 3) return false;
+    if (password.length < 4) return false;
     return true;
 }
 
@@ -54,65 +54,47 @@ interface IState {
     password: string,
 }
 
-class Login extends React.Component<AllProps, IState> {
-    constructor(props: AllProps) {
-        super(props);
+function handleChange(setter:React.Dispatch<React.SetStateAction<string>>, event:React.ChangeEvent<HTMLInputElement>):void {
+    setter(event.target.value);
+}
 
-        this.state = {
-            username:"",
-            password: "",
-        }
-    }
+const Login: React.FC<AllProps> = (props:AllProps) => {
+    const { busy, errors, doLogin } = props;
 
-    private handleSubmit(event:React.FormEvent): void {
+    const [ currentUsername, setUsername ] = React.useState("");
+    const [ currentPassword, setPassword ] = React.useState("");
+
+    const doSubmit = (event:React.FormEvent) => {
         event.preventDefault();
-        this.props.doLogin(this.state.username, this.state.password);
+        doLogin(currentUsername, currentPassword);
     }
 
-    private handleChange(field: string, event:React.ChangeEvent<HTMLInputElement>): void {
-        switch (field) {
-            case "username":
-                this.setState({username: event.target.value});
-                break;
-            case "password":
-                this.setState({password: event.target.value});
-                break;
-            default:
-                console.error("Unknown field: " + field);
-        }
-    }
-
-    render() {
-
-        const { busy, errors } = this.props;
-
-        return (
-            <Paper id="login">
-                <Typography variant="h1">Login</Typography>
-                <form className="form" autoComplete="false" onSubmit={this.handleSubmit.bind(this)}>
-                    <TextField
-                        id="username"
-                        label="Username"
-                        value={this.state.username}
-                        onChange={this.handleChange.bind(this,'username')}
-                        placeholder="username"
-                        margin="normal"
-                        type="text"
-                    />
-                    <TextField
-                        id="password"
-                        label="Password"
-                        value={this.state.password}
-                        onChange={this.handleChange.bind(this,'password')}
-                        margin="normal"
-                        type="password"
-                    />
-                    {renderLogin(isValid(this.state), busy)}
-                </form>
-                {renderErrors(errors)}
-            </Paper>
-        )
-    }
+    return (
+        <Paper id="login">
+            <Typography variant="h1">Login</Typography>
+            <form className="form" autoComplete="false" onSubmit={doSubmit}>
+                <TextField
+                    id="username"
+                    label="Username"
+                    value={currentUsername}
+                    onChange={handleChange.bind(null,setUsername)}
+                    placeholder="username"
+                    margin="normal"
+                    type="text"
+                />
+                <TextField
+                    id="password"
+                    label="Password"
+                    value={currentPassword}
+                    onChange={handleChange.bind(null,setPassword)}
+                    margin="normal"
+                    type="password"
+                />
+                {renderLogin(isValid(currentUsername, currentPassword), busy)}
+            </form>
+            {renderErrors(errors)}
+        </Paper>
+    )
 }
 
 function mapStateToProps(state: StoreState):PropsFromState {
@@ -123,7 +105,7 @@ function mapStateToProps(state: StoreState):PropsFromState {
     }
 }
 
-function mapDispatchToProps(dispatch: Dispatch):PropsFromDispatch {
+function mapDispatchToProps(dispatch: ReduxDispatch):PropsFromDispatch {
     return {
         doLogin: (username, password) => dispatch(Actions.Login(username, password))
     }

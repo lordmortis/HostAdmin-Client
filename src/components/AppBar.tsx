@@ -1,7 +1,7 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { Dispatch } from 'redux';
 import { connect } from 'react-redux';
-import { withRouter, RouteComponentProps } from 'react-router-dom';
+import {useNavigate, useLocation, Location} from 'react-router-dom';
 
 import Divider from "@material-ui/core/Divider";
 import Drawer  from "@material-ui/core/Drawer";
@@ -32,107 +32,121 @@ interface PropsFromReact {
     children: React.ReactNode
 }
 
-type AllProps = PropsFromState & PropsFromDispatch & PropsFromReact & RouteComponentProps
+type AllProps = PropsFromState & PropsFromDispatch & PropsFromReact
 
-interface IState {
-    menuVisible: boolean
+interface INavigation {
+    navigate: Function
+    currentLocation: Location
 }
 
-class AppBar extends React.Component<AllProps, IState> {
-    constructor(props: AllProps) {
-        super(props);
+interface IMenuState {
+    menuVisibility: boolean
+    setMenuVisibility: Function
+}
 
-        this.state = {
-            menuVisible: false,
-        }
+interface ISectionButton {
+    path: string
+    name: string
+    icon?: React.ReactNode
+}
+
+const menuItems:ISectionButton[] = [
+    {path: "/domains", name: "Domains", icon: <IconDNS/>},
+    {path: "/users", name: "Users", icon: <IconPeople/>},
+]
+
+function renderSectionButton(state:INavigation & IMenuState, buttonData:ISectionButton): React.ReactNode {
+    const children = []
+    const selected = state.currentLocation.pathname.startsWith(buttonData.path)
+
+    const urlPush = () => {
+        state.setMenuVisibility(false);
+        if (selected) return;
+        state.navigate(buttonData.path);
     }
 
-    private renderMenuIcon(): React.ReactNode {
-        const { username } = this.props;
-
-        if (username === undefined) return null;
-        return (
-            <IconButton color={"inherit"} aria-label={"Menu"} onClick={this.handleMenuToggle.bind(this)}>
-                <MenuIcon/>
-            </IconButton>
-        )
+    if (buttonData.icon != null) {
+        children.push(<ListItemIcon>{buttonData.icon}</ListItemIcon>)
     }
 
-    private renderSectionButton(path: string, name: string, icon?: React.ReactNode): React.ReactNode {
-        const absPath = `/${path}`;
-        const showing = this.props.location.pathname.startsWith(absPath);
-        const children = []
+    children.push(<ListItemText children={buttonData.name}/>)
 
-        const urlPush = () => {
-            this.props.history.push(absPath);
-            this.setState({menuVisible: false});
-        }
+    return (
+        <ListItem button key={buttonData.path} selected={selected} children={children} onClick={urlPush}/>
+    );
+}
 
-        if (icon != null) {
-            children.push(<ListItemIcon>{icon}</ListItemIcon>)
-        }
+function renderMenuIcon(menuState:IMenuState, authenticated:boolean): React.ReactNode {
+    if (!authenticated) return null;
 
-        children.push(<ListItemText children={name}/>)
-
-        return (
-            <ListItem button key={path} selected={showing} children={children} onClick={urlPush.bind(this)}/>
-        );
+    const onClick = () => {
+        menuState.setMenuVisibility(true);
     }
 
-    private renderMenu(): React.ReactNode {
-        const { menuVisible }: Readonly<IState> = this.state;
+    return (
+        <IconButton color={"inherit"} aria-label={"Menu"} onClick={onClick}>
+            <MenuIcon/>
+        </IconButton>
+    )
+}
 
-        const { username }: Readonly<AllProps> = this.props;
-
-        return (
-            <Drawer anchor={"left"} open={menuVisible} onClose={this.handleMenuToggle.bind(this)}>
-                <Typography key={"title"} align={"center"} variant={"h3"} children={"Menu"}/>
-                <Typography key={"username"} align={"center"} children={username}/>
-                <Divider/>
-                <List>
-                    {this.renderSectionButton("domains", "Domains", <IconDNS/>)}
-                    {this.renderSectionButton("users", "Users", <IconPeople/>)}
-                    <ListItem button key={"logout"}>
-                        <ListItemIcon><IconExitToApp/></ListItemIcon>
-                        <ListItemText>Logout</ListItemText>
-                    </ListItem>
-                </List>
-            </Drawer>
-        )
+function renderMenu(menuState:IMenuState, navigationState:INavigation, doLogout:Function, username:string | undefined): React.ReactNode {
+    const onClose = () => {
+        menuState.setMenuVisibility(false)
     }
 
-    private handleCloseMenu() {
-        this.setState({...this.state, menuVisible: false});
+    const onLogout = () => {
+        navigationState.navigate("/")
+        doLogout();
     }
 
-    private handleMenuToggle() {
-        this.setState({...this.state, menuVisible: !this.state.menuVisible});
+    return (
+        <Drawer anchor={"left"} open={menuState.menuVisibility} onClose={onClose}>
+            <Typography key={"title"} align={"center"} variant={"h3"} children={"Menu"}/>
+            <Typography key={"username"} align={"center"} children={username}/>
+            <Divider/>
+            <List>
+                {menuItems.map((item) => renderSectionButton({...menuState, ...navigationState}, item))}
+                <ListItem button key={"logout"} onClick={onLogout}>
+                    <ListItemIcon><IconExitToApp/></ListItemIcon>
+                    <ListItemText>Logout</ListItemText>
+                </ListItem>
+            </List>
+        </Drawer>
+    )
+}
+
+const AppBar: React.FC<AllProps> = (props: AllProps) => {
+    const [ menuVisible, setMenuVisible ] = useState(false);
+    const menuState:IMenuState = {
+        menuVisibility: menuVisible,
+        setMenuVisibility: setMenuVisible
     }
 
-    private handleLogout() {
-        this.handleCloseMenu();
-        this.props.doLogout();
+    const navigationState:INavigation = {
+        navigate: useNavigate(),
+        currentLocation: useLocation()
     }
 
-    render() {
-        return (
+    const { username } = props;
+
+    return (
+        <div>
             <div>
-                <div>
-                    <MUIAppBar position="static">
-                        <Toolbar>
-                            {this.renderMenuIcon()}
-                            <Typography variant="h6" color="inherit">
-                                {this.props.children}
-                            </Typography>
-                        </Toolbar>
-                    </MUIAppBar>
-                </div>
-                <div>
-                    {this.renderMenu()}
-                </div>
+                <MUIAppBar position="static">
+                    <Toolbar>
+                        {renderMenuIcon(menuState, username != null)}
+                        <Typography variant="h6" color="inherit">
+                            {props.children}
+                        </Typography>
+                    </Toolbar>
+                </MUIAppBar>
             </div>
-        );
-    }
+            <div>
+                {renderMenu(menuState, navigationState, props.doLogout, username)}
+            </div>
+        </div>
+    );
 }
 
 function mapStateToProps(state: StoreState):PropsFromState {
@@ -147,4 +161,4 @@ function mapDispatchToProps(dispatch: Dispatch):PropsFromDispatch {
     }
 }
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(AppBar));
+export default connect(mapStateToProps, mapDispatchToProps)(AppBar);

@@ -27,22 +27,8 @@ function parseModel(data: any):UserModel {
 }
 
 export function List(offset: number, limit: number) : Promise<UserListResponse> {
-    const options = {
-        method: "GET"
-    };
-
-    return fetch(base.urlBase + "/1/users", base.addDefaults(options))
-        .then(response => {
-            if (response.status !== 200) {
-                throw new Error("Server Error: " + response.status);
-            }
-            return response.json().then(decodedResponse => {
-                return {
-                    data: decodedResponse.models.map(parseModel),
-                    totalRecords: decodedResponse.meta.total,
-                }
-            });
-        });
+    const url = `${base.urlBase}/1/users?offset=${offset}&limit=${limit}`
+    return base.arrayFetch<UserModel>(url, parseModel);
 }
 
 export function CreateOrUpdate(data: UserModel) : Promise<UserModel> {

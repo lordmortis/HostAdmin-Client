@@ -1,9 +1,8 @@
 import React, {ReactNode} from 'react';
 import { Store } from 'redux'
 import { Provider as ReduxProvider, connect } from 'react-redux';
-import { ConnectedRouter } from 'connected-react-router'
 import { History } from "history";
-import { Route, Switch } from 'react-router-dom';
+import {Routes, Route, useRoutes, BrowserRouter} from 'react-router-dom';
 
 import CssBaseline from '@material-ui/core/CssBaseline';
 
@@ -14,6 +13,11 @@ import DomainsPage from './pages/Domains';
 import LoginPage from './pages/Login';
 import UsersPage from './pages/Users';
 
+const appRoutes = [
+    {path: "/domains", element: <DomainsPage/>},
+    {path: "/users", element: <UsersPage/>}
+]
+
 interface IProps {
     store: Store<StoreState>
     history: History
@@ -23,39 +27,29 @@ interface PropsFromState {
     auth?: boolean,
 }
 
-function renderPages(auth?: boolean) : ReactNode {
-    if (!auth) {
-        return <LoginPage/>;
-    }
+interface RouterProps {
+    auth?: boolean
+}
 
-    const routes = [];
-
-    routes.push(<Route key="domains" path="/domains" component={DomainsPage}/>);
-    routes.push(<Route key="users" path="/users" component={UsersPage}/>);
-
-    return (
-        <Switch>
-            {routes}
-        </Switch>
-    )
+const AppRoutes:React.FC<RouterProps> = (props:PropsFromState) => {
+    return (useRoutes(appRoutes))
 }
 
 const App: React.FC<IProps> = (props: IProps & PropsFromState) => {
     return (
         <div>
             <ReduxProvider store={props.store}>
-                <ConnectedRouter history={props.history}>
+                <BrowserRouter>
                     <CssBaseline/>
                     <div className="App">
                         <AppBar>Admin System</AppBar>
-                        {renderPages(props.auth)}
+                        {props.auth ? <AppRoutes/> : <LoginPage/>}
                     </div>
-                </ConnectedRouter>
+                </BrowserRouter>
             </ReduxProvider>
         </div>
     );
 };
-
 
 function mapStateToProps(state: StoreState):PropsFromState {
     return {

@@ -1,4 +1,5 @@
 import * as base from './base'
+import {UserListResponse, UserModel} from "./Users";
 
 export interface DomainModel {
     id?: string;
@@ -22,27 +23,9 @@ function parseModel(data: any):DomainModel {
 }
 
 export function List(offset: number, limit: number) : Promise<DomainListResponse> {
-    const options = {
-        method: "GET"
-    };
-
-    return fetch(base.urlBase + "/1/domains", base.addDefaults(options))
-        .then(response => {
-            if (response.status !== 200) {
-                throw new Error("Server Error: " + response.status);
-            }
-            return response.json().then(decodedResponse => {
-                return {
-                    data: decodedResponse.models.map(parseModel),
-                    totalRecords: decodedResponse.meta.total,
-                }
-            });
-    });
+    const url = `${base.urlBase}/1/domains?offset=${offset}&limit=${limit}`
+    return base.arrayFetch<DomainModel>(url, parseModel);
 }
-
-/*export function Get(id: string) : Promise<DomainResponse> {
-
-}*/
 
 export function CreateOrUpdate(data: DomainModel) : Promise<DomainModel> {
     const options = {

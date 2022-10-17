@@ -11,18 +11,17 @@ import TextField from '@material-ui/core/TextField';
 import Checkbox from '@material-ui/core/Checkbox';
 import Typography from "@material-ui/core/Typography";
 
-
-interface Field {
+export interface Field {
     field: string,
     header: string,
     type: string,
 }
 
-interface FieldUpdateFunc {
+export interface FieldUpdateFunc {
     (field:string, newValue:any):void;
 }
 
-interface Props {
+interface IProps {
     busy: boolean;
     type: string;
     fields: Array<Field>;
@@ -30,10 +29,6 @@ interface Props {
     updateField: FieldUpdateFunc;
     cancelEdit: ()=>void;
     saveEdit: ()=>void;
-}
-
-interface IState {
-
 }
 
 function updateFromFieldWithValue(update: FieldUpdateFunc, field:string, event: React.ChangeEvent<HTMLTextAreaElement>):void {
@@ -47,7 +42,7 @@ function updateFromCheckboxField(update: FieldUpdateFunc, field:string, event: R
     update(field, checked);
 }
 
-function renderField(disabled: boolean, modelData: any, update: FieldUpdateFunc, fieldData: Field):ReactNode {
+function renderField(disabled: boolean, modelData: any, update: FieldUpdateFunc, fieldData: Field):React.ReactNode {
 
     const fieldValue = modelData[fieldData.field];
 
@@ -99,32 +94,27 @@ function renderField(disabled: boolean, modelData: any, update: FieldUpdateFunc,
     return <FormControl key={fieldData.field} children={data}/>;
 }
 
-export default class EditModel extends React.Component<Props, IState> {
-
-    private renderFields():ReactNode {
-        const { fields, updateField, modelData, busy } = this.props;
-        return fields.map(renderField.bind(null, busy, modelData, updateField));
-    }
-
-    render() {
-        const { modelData, type, cancelEdit, saveEdit } = this.props;
-
-        const newRecord = modelData["id"] === undefined;
-
-        const title = newRecord ? `Create ${type}` : `Editing ${type}`
-
-
-        return (
-            <Dialog open={true}>
-                <DialogTitle>{title}</DialogTitle>
-                <DialogContent>
-                    {this.renderFields()}
-                </DialogContent>
-                <DialogActions>
-                    <Button children={"Save"} color={"primary"} onClick={saveEdit} variant={"contained"}/>
-                    <Button children={"Cancel"} color={"secondary"} onClick={cancelEdit} variant={"contained"}/>
-                </DialogActions>
-            </Dialog>
-        )
-    }
+function renderFields(props:IProps):React.ReactNode {
+    return props.fields.map(renderField.bind(null, props.busy, props.modelData, props.updateField));
 }
+
+const EditModel: React.FC<IProps> = (props:IProps) => {
+
+    const newRecord = props.modelData["id"] === undefined;
+    const title = newRecord ? `Create ${props.type}` : `Editing ${props.type}`
+
+    return (
+        <Dialog open={true}>
+            <DialogTitle>{title}</DialogTitle>
+            <DialogContent>
+                {renderFields(props)}
+            </DialogContent>
+            <DialogActions>
+                <Button children={"Save"} color={"primary"} onClick={props.saveEdit} variant={"contained"}/>
+                <Button children={"Cancel"} color={"secondary"} onClick={props.cancelEdit} variant={"contained"}/>
+            </DialogActions>
+        </Dialog>
+    )
+}
+
+export default EditModel;
