@@ -7,6 +7,8 @@ import TableHead from '@material-ui/core/TableHead';
 import TablePagination from '@material-ui/core/TablePagination';
 import TableRow from '@material-ui/core/TableRow';
 import Typography from '@material-ui/core/Typography';
+import {NavigateFunction, useNavigate} from "react-router-dom";
+import {TableFooter} from "@material-ui/core";
 
 type FetchFunc = (offset: number, limit: number) => void;
 
@@ -129,11 +131,13 @@ const CustomTable: React.FC<IProps> = (props:IProps) => {
 
     return (
         <div>
-            <Table>
+            <Table key="main">
                 {renderHeader(props.columns)}
                 {renderBody(props.fetchFunc, props.data, props.limit, props.offset, props.columns)}
+                <TableFooter>
+                    {renderPagination(props.totalRecords, props.fetchFunc, props.limit, props.offset)}
+                </TableFooter>
             </Table>
-            {renderPagination(props.totalRecords, props.fetchFunc, props.limit, props.offset)}
         </div>
     )
 }

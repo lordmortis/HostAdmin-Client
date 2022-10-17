@@ -1,7 +1,4 @@
 import React from "react";
-import { State as StoreState } from "../store";
-import { Dispatch } from "redux";
-import { connect } from "react-redux";
 
 import Button from "@material-ui/core/Button";
 import Paper from "@material-ui/core/Paper";

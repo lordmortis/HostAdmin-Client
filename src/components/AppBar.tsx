@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import { Dispatch } from 'redux';
 import { connect } from 'react-redux';
-import {useNavigate, useLocation, Location} from 'react-router-dom';
+import {useNavigate, useLocation, Location, NavigateFunction} from 'react-router-dom';
 
 import Divider from "@material-ui/core/Divider";
 import Drawer  from "@material-ui/core/Drawer";
@@ -35,7 +35,7 @@ interface PropsFromReact {
 type AllProps = PropsFromState & PropsFromDispatch & PropsFromReact
 
 interface INavigation {
-    navigate: Function
+    navigate: NavigateFunction
     currentLocation: Location
 }
 
@@ -66,10 +66,10 @@ function renderSectionButton(state:INavigation & IMenuState, buttonData:ISection
     }
 
     if (buttonData.icon != null) {
-        children.push(<ListItemIcon>{buttonData.icon}</ListItemIcon>)
+        children.push(<ListItemIcon key="icon">{buttonData.icon}</ListItemIcon>)
     }
 
-    children.push(<ListItemText children={buttonData.name}/>)
+    children.push(<ListItemText key="text" children={buttonData.name}/>)
 
     return (
         <ListItem button key={buttonData.path} selected={selected} children={children} onClick={urlPush}/>
@@ -84,7 +84,7 @@ function renderMenuIcon(menuState:IMenuState, authenticated:boolean): React.Reac
     }
 
     return (
-        <IconButton color={"inherit"} aria-label={"Menu"} onClick={onClick}>
+        <IconButton key="menu" color={"inherit"} aria-label={"Menu"} onClick={onClick}>
             <MenuIcon/>
         </IconButton>
     )
@@ -104,12 +104,12 @@ function renderMenu(menuState:IMenuState, navigationState:INavigation, doLogout:
         <Drawer anchor={"left"} open={menuState.menuVisibility} onClose={onClose}>
             <Typography key={"title"} align={"center"} variant={"h3"} children={"Menu"}/>
             <Typography key={"username"} align={"center"} children={username}/>
-            <Divider/>
-            <List>
+            <Divider key={"divider1"}/>
+            <List key="otherButtons">
                 {menuItems.map((item) => renderSectionButton({...menuState, ...navigationState}, item))}
                 <ListItem button key={"logout"} onClick={onLogout}>
-                    <ListItemIcon><IconExitToApp/></ListItemIcon>
-                    <ListItemText>Logout</ListItemText>
+                    <ListItemIcon key="icon"><IconExitToApp/></ListItemIcon>
+                    <ListItemText key="text">Logout</ListItemText>
                 </ListItem>
             </List>
         </Drawer>

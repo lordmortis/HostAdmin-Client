@@ -10,11 +10,13 @@ import {State as StoreState} from './store';
 
 import AppBar from './components/AppBar';
 import DomainsPage from './pages/Domains';
+import DomainPage from './pages/Domain';
 import LoginPage from './pages/Login';
 import UsersPage from './pages/Users';
 
 const appRoutes = [
     {path: "/domains", element: <DomainsPage/>},
+    {path: "/domain/:id", element: <DomainPage/>},
     {path: "/users", element: <UsersPage/>}
 ]
 
